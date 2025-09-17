@@ -51,4 +51,4 @@ Open the index.html file in your web browser to view the frontend dashboard. The
 Contributing
 We welcome contributions! Please feel free to open an issue or submit a pull request.
 
-This README was created for the AI Traffic Control Management System project.
+This README was created for the AI Traffic Control Management System project with Video samples.
