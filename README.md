@@ -33,8 +33,7 @@ Flask
 Installation
 Clone the repository:
 
-git clone [https://github.com/your-username/ai-traffic-control.git](https://github.com/your-username/ai-traffic-control.git)
-cd ai-traffic-control
+
 
 Set up the backend:
 
