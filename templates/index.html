@@ -1,131 +1,345 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traffic Controller Input</title>
-    <style>
-        /* General Body Styles */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+  <meta charset="utf-8" />
+  <title>AI Traffic Controller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg:#0b1220; --card:#101b33; --border:#1d2942; --text:#e8eefb; --muted:#9fb2dd;
+      --green:#16a34a; --red:#e11d48; --yellow:#eab308; --accent:#2a6df4;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Arial}
+    header{padding:16px 24px;border-bottom:1px solid var(--border);background:#0e1628}
+    h1{margin:0;font-size:20px}
+    main{padding:20px 24px;display:grid;gap:20px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+    label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
+    select,input[type=file]{background:#0c1530;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    button{background:var(--accent);border:0;color:white;padding:10px 14px;border-radius:10px;cursor:pointer}
+    button.secondary{background:#1d2942}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .uploads{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+    .lane{border:1px solid var(--border);border-radius:12px;padding:12px;background:#0f1a31}
+    .lane h3{margin:0 0 8px 0;font-size:16px}
+    .signal{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#0b1430;font-size:13px}
+    .dot{width:10px;height:10px;border-radius:999px;background:#334}
+    .dot.red{background:var(--red)}
+    .dot.green{background:var(--green)}
+    .dot.yellow{background:var(--yellow)}
+    .status{font-size:13px;color:var(--muted);margin-top:6px}
+    .success{color:#86efac}
+    .error{color:#fecaca}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+    .gallery img{width:100%;border-radius:10px;border:1px solid var(--border);background:#000;cursor:zoom-in}
+    .muted{color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    footer{padding:12px 24px;color:var(--muted);border-top:1px solid var(--border)}
+    .split{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    @media (max-width:900px){.split{grid-template-columns:1fr}}
+    .feed{width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;border-radius:10px;border:1px solid var(--border);display:block;margin:8px 0;cursor:zoom-in}
 
-        /* Form Container */
-        form {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Header */
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
-
-        /* Labels */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
-
-        /* General Input Styles */
-        input[type="number"],
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            color: #333;
-        }
-
-        /* Specific style for file inputs to improve appearance */
-        input[type="file"]::file-selector-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        input[type="file"]::file-selector-button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Container for Video Inputs */
-        #video-inputs {
-            margin-top: 20px;
-        }
-
-        #video-inputs label {
-            margin-top: 15px;
-        }
-
-        /* Submit Button */
-        button[type="submit"] {
-            width: 100%;
-            padding: 15px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #218838;
-        }
-
-        button[type="submit"]:active {
-            transform: scale(0.98);
-        }
-    </style>
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.8); z-index: 1000; padding: 24px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-content {
+      position: relative; max-width: 95vw; max-height: 90vh; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); background:#000;
+    }
+    .lightbox img {
+      display: block; max-width: 95vw; max-height: 90vh; object-fit: contain; cursor: grab;
+      user-select: none; -webkit-user-drag: none;
+      transform-origin: center center;
+    }
+    .lightbox .close {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.6); color: #fff; border: 0;
+      border-radius: 8px; padding: 8px 10px; cursor: pointer;
+    }
+    .lightbox .caption {
+      position: absolute; left: 0; right: 0; bottom: 0; color: #cfd8ff; font-size: 12px;
+      padding: 6px 10px; background: linear-gradient(transparent, rgba(0,0,0,.6));
+    }
+    .kbd {padding:1px 6px;border:1px solid #3c4563;border-radius:6px;background:#101b33;color:#cfd8ff}
+  </style>
 </head>
 <body>
-    <form action="/start" method="POST" enctype="multipart/form-data">
-        <h1>Traffic Lane Configuration</h1>
+  <header><h1>AI-Powered Dynamic Traffic Control</h1></header>
 
-        <label for="lanes">Number of lanes (3 or 4):</label>
-        <input type="number" name="lanes" id="lanes" min="3" max="4" required>
-
-        <div id="video-inputs">
-            <label for="lane1">Lane 1 Video:</label>
-            <input type="file" id="lane1" name="lane1" accept="video/*" required><br>
-
-            <label for="lane2">Lane 2 Video:</label>
-            <input type="file" id="lane2" name="lane2" accept="video/*" required><br>
-
-            <label for="lane3">Lane 3 Video:</label>
-            <input type="file" id="lane3" name="lane3" accept="video/*" required><br>
-
-            <label for="lane4">Lane 4 Video (optional):</label>
-            <input type="file" id="lane4" name="lane4" accept="video/*"><br>
+  <main>
+    <!-- Controls -->
+    <section class="panel">
+      <h2 style="margin:0 0 10px 0;font-size:18px;">Setup</h2>
+      <div class="row">
+        <div>
+          <label for="lanes">Intersection Lanes</label>
+          <select id="lanes">
+            <option value="2">2 Lanes</option>
+            <option value="3">3 Lanes</option>
+            <option value="4" selected>4 Lanes</option>
+          </select>
         </div>
+        <div>
+          <button id="startBtn">Start</button>
+          <button id="stopBtn" class="secondary" disabled>Stop</button>
+        </div>
+      </div>
 
-        <button type="submit">Start Traffic Controller</button>
-    </form>
+      <div id="uploads" class="uploads"></div>
+      <div id="msg" class="hint"></div>
+    </section>
+
+    <section class="split">
+      <!-- Lanes/streams -->
+      <section class="panel">
+        <h2 style="margin:0 0 10px 0;font-size:18px;">Lanes & Live Streams</h2>
+        <div id="lanesGrid" class="grid"></div>
+        <div class="hint">
+          Click any stream or violator photo to enlarge. <span class="kbd">Esc</span> to close, scroll to zoom, drag to pan.
+        </div>
+      </section>
+
+      <!-- Violators -->
+      <section class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <h2 style="margin:0;font-size:18px;">Violators</h2>
+          <div class="row" style="gap:8px">
+            <button id="refreshViolators" class="secondary">Refresh</button>
+            <label class="muted" style="margin:0;font-size:12px;">Auto-refresh every 3s</label>
+          </div>
+        </div>
+        <div id="violators" class="gallery"></div>
+        <div class="hint">Violators are saved to <code> This Section</div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Lightbox viewer -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lightbox-content">
+      <button class="close" id="lbClose" title="Close (Esc)">✕</button>
+      <img id="lbImg" alt="Preview" />
+      <div class="caption" id="lbCaption"></div>
+    </div>
+  </div>
+
+  <footer>Traffic Control Management System</footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function buildUI(lanes) {
+      const uploads = $('uploads');
+      const grid = $('lanesGrid');
+      uploads.innerHTML = '';
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= lanes; i++) {
+        // file inputs
+        const wrap = document.createElement('div');
+        wrap.innerHTML = `
+          <label>Lane ${i} Video</label>
+          <input type="file" id="lane${i}" accept="video/*" />
+        `;
+        uploads.appendChild(wrap);
+
+        // lane card + stream (enlargeable)
+        const card = document.createElement('div');
+        card.className = 'lane';
+        card.innerHTML = `
+          <h3>Lane ${i}</h3>
+          <img id="feed${i}" class="feed enlargeable" alt="Lane ${i} stream (after start)" data-caption="Lane ${i} — Live stream" />
+          <div class="signal"><span class="dot red" id="dot${i}"></span><span id="sig${i}">RED</span></div>
+          <div class="status" id="status${i}">Waiting to start…</div>
+        `;
+        grid.appendChild(card);
+      }
+      bindEnlargeHandlers();
+    }
+
+    // initial
+    const lanesSelect = $('lanes');
+    buildUI(parseInt(lanesSelect.value, 10));
+    lanesSelect.addEventListener('change', () => buildUI(parseInt(lanesSelect.value, 10)));
+
+    function setSignal(idx, status) {
+      const dot = $('dot' + idx);
+      const sig = $('sig' + idx);
+      dot.classList.remove('red','green','yellow');
+      if (status === 'GREEN') dot.classList.add('green');
+      else if (status === 'YELLOW') dot.classList.add('yellow');
+      else dot.classList.add('red');
+      sig.textContent = status;
+    }
+
+    // Start
+    $('startBtn').addEventListener('click', async () => {
+      const lanes = parseInt($('lanes').value, 10);
+      const fd = new FormData();
+      fd.append('lanes', String(lanes));
+
+      for (let i = 1; i <= lanes; i++) {
+        const f = $('lane' + i).files[0];
+        if (!f) {
+          $('msg').innerHTML = `<span class="error">Please select a video for lane ${i}.</span>`;
+          return;
+        }
+        fd.append('lane' + i, f, f.name);
+        $('status' + i).textContent = 'Uploading…';
+      }
+
+      $('startBtn').disabled = true;
+      $('stopBtn').disabled = false;
+      $('msg').textContent = 'Uploading and starting…';
+
+      try {
+        const res = await fetch('/start', { method: 'POST', body: fd });
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || ('HTTP ' + res.status));
+        $('msg').innerHTML = `<span class="success">${text}</span>`;
+
+        // show streams
+        for (let i = 1; i <= lanes; i++) {
+          $('feed' + i).src = `/stream/${i}?t=${Date.now()}`;
+          $('status' + i).textContent = 'Streaming…';
+          setSignal(i, 'YELLOW');
+        }
+      } catch (err) {
+        $('msg').innerHTML = `<span class="error">Start failed: ${err.message}</span>`;
+        $('startBtn').disabled = false;
+        $('stopBtn').disabled = true;
+      }
+    });
+
+    // Stop
+    $('stopBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/stop', { method: 'POST' });
+        const text = await res.text();
+        $('msg').textContent = text;
+      } catch (_) {}
+      $('startBtn').disabled = false;
+      $('stopBtn').disabled = true;
+    });
+
+    // Violators
+    async function fetchViolators() {
+      try {
+        const res = await fetch('/violators/list');
+        if (!res.ok) throw new Error('No list endpoint yet');
+        const data = await res.json();
+        const g = $('violators');
+        const seen = new Set(Array.from(g.querySelectorAll('img')).map(img => img.dataset.fn));
+        (data.files || []).forEach(fn => {
+          if (seen.has(fn)) return;
+          const img = document.createElement('img');
+          img.src = '/violators/' + fn + '?t=' + Date.now();
+          img.dataset.fn = fn;
+          img.dataset.caption = `Violator — ${fn}`;
+          img.alt = fn;
+          img.className = 'enlargeable';
+          g.prepend(img);
+        });
+        bindEnlargeHandlers(); // re-bind for new images
+      } catch (e) {}
+    }
+    $('refreshViolators').addEventListener('click', fetchViolators);
+    setInterval(fetchViolators, 3000);
+
+    // Signals
+    async function pollStatus() {
+      try {
+        const res = await fetch('/status');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.signals) return;
+        data.signals.forEach((s, i) => setSignal(i + 1, (s || 'RED').toUpperCase()));
+      } catch(_) {}
+    }
+    setInterval(pollStatus, 1000);
+
+    // ---------------- Lightbox logic ----------------
+    const lb = $('lightbox');
+    const lbImg = $('lbImg');
+    const lbCaption = $('lbCaption');
+    const lbClose = $('lbClose');
+
+    let scale = 1, originX = 0, originY = 0, startX = 0, startY = 0, dragging = false;
+
+    function openLightbox(src, caption='') {
+      lbImg.src = src;
+      lbCaption.textContent = caption;
+      scale = 1; originX = 0; originY = 0; dragging = false;
+      updateTransform();
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+    }
+    function closeLightbox() {
+      lb.classList.remove('open');
+      lb.setAttribute('aria-hidden', 'true');
+      lbImg.src = '';
+      lbCaption.textContent = '';
+    }
+    function updateTransform() {
+      lbImg.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+      lbImg.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
+    }
+
+    function bindEnlargeHandlers() {
+      document.querySelectorAll('.enlargeable').forEach(el => {
+        el.onclick = () => {
+          const src = el.src;
+          const caption = el.dataset.caption || el.alt || '';
+          // For MJPEG streams, add a cache-buster
+          const viewSrc = src.includes('/stream/') ? `${src.split('?')[0]}?view=${Date.now()}` : src;
+          openLightbox(viewSrc, caption);
+        };
+      });
+    }
+
+    // Close handlers
+    lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+    lbClose.addEventListener('click', closeLightbox);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+    // Zoom (wheel)
+    lbImg.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = Math.sign(e.deltaY);
+      const newScale = Math.min(5, Math.max(1, scale - delta * 0.2));
+      // keep centered on cursor
+      if (newScale !== scale) {
+        const rect = lbImg.getBoundingClientRect();
+        const cx = e.clientX - rect.left - rect.width/2;
+        const cy = e.clientY - rect.top - rect.height/2;
+        originX = (originX - cx) * (newScale/scale) + cx;
+        originY = (originY - cy) * (newScale/scale) + cy;
+        scale = newScale;
+        updateTransform();
+      }
+    }, { passive: false });
+
+    // Drag (when zoomed)
+    lbImg.addEventListener('mousedown', (e) => {
+      if (scale <= 1) return;
+      dragging = true; startX = e.clientX - originX; startY = e.clientY - originY;
+      lbImg.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      originX = e.clientX - startX;
+      originY = e.clientY - startY;
+      updateTransform();
+    });
+    window.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false; lbImg.style.cursor = 'grab';
+    });
+  </script>
 </body>
 </html>
